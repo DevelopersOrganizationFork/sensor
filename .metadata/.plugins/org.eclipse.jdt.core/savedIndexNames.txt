@@ -1,0 +1,26 @@
+INDEX VERSION 1.127+E:\Magisterka\programowanieZespolowe\sensor\.metadata\.plugins\org.eclipse.jdt.core
+2620426498.index
+1811389807.index
+265732991.index
+2804169155.index
+3158849313.index
+2271913353.index
+1741827211.index
+4039342660.index
+2634579158.index
+3491804422.index
+105210318.index
+1926144101.index
+2959774643.index
+174553.index
+251782801.index
+1198961354.index
+2248287622.index
+3038630371.index
+1947175009.index
+2815030579.index
+1945235352.index
+739287492.index
+2845406803.index
+1667022092.index
+4134526084.index
