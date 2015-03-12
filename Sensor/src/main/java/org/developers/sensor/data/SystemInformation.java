@@ -1,4 +1,4 @@
-package fiis.team.sensor.data;
+package org.developers.sensor.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

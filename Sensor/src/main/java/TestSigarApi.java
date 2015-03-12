@@ -1,8 +1,5 @@
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import fiis.team.sensor.source.SensorRunnable;
+import org.developers.sensor.client.SensorClient;
 
 /*
  * FIXME org.hyperic.sigar.SigarException: no sigar-amd64-winnt.dll in java.library.path
@@ -17,12 +14,6 @@ import fiis.team.sensor.source.SensorRunnable;
 public class TestSigarApi {
 	
 	public static void main(String[] args) {
-		
-		ScheduledExecutorService executor = Executors
-				.newSingleThreadScheduledExecutor();
-		
-		SensorRunnable runner = new SensorRunnable();
-		
-		executor.scheduleWithFixedDelay(runner, 0L, 5L, TimeUnit.SECONDS);
+		new SensorClient().start();
 	}
 }

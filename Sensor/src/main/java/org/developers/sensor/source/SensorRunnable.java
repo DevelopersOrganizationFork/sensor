@@ -1,14 +1,13 @@
-package fiis.team.sensor.source;
+package org.developers.sensor.source;
+import org.developers.sensor.data.JSONCpu;
+import org.developers.sensor.data.JSONMemory;
+import org.developers.sensor.data.SystemInformation;
 import org.hyperic.sigar.Cpu;
 import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fiis.team.sensor.data.JSONCpu;
-import fiis.team.sensor.data.JSONMemory;
-import fiis.team.sensor.data.SystemInformation;
 
 
 public class SensorRunnable implements Runnable {
