@@ -1,9 +1,22 @@
 package org.developers.sensor.source;
+import javax.jms.JMSException;
+
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.developers.sensor.data.JSONCpu;
+import org.developers.sensor.data.JSONDisk;
+import org.developers.sensor.data.JSONHost;
+import org.developers.sensor.data.JSONMeasurement;
 import org.developers.sensor.data.JSONMemory;
-import org.developers.sensor.data.SystemInformation;
+import org.developers.sensor.data.JSONNetworkInfo;
+import org.developers.sensor.data.JSONNetworkStat;
+import org.developers.sensor.data.JSONSystemInformation;
+import org.developers.sensor.jms.producer.JMSConnection;
 import org.hyperic.sigar.Cpu;
 import org.hyperic.sigar.Mem;
+import org.hyperic.sigar.NetInterfaceConfig;
+import org.hyperic.sigar.NetInterfaceStat;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.slf4j.Logger;
@@ -15,58 +28,61 @@ public class SensorRunnable implements Runnable {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SensorRunnable.class);
 	
-//	private Sender sender = new Sender(); TODO
-	
-	private void start() {
-		// TODO Auto-generated method stub
-		
-	}
+	private JMSConnection jmsConnnection = new JMSConnection();
+	private ObjectMapper mapper = new ObjectMapper();
 	
 	public void run() {
 		try {			
-			SystemInformation information = createSystemInformation();
-			
-			//TODO send information to jms queue
+			JSONSystemInformation information = createSystemInformation();
+
+			jmsConnnection.sendMessage(mapper.writeValueAsString(information));
+			logger.info("information: " + mapper.writeValueAsString(information));
 		} catch (SigarException e) {
 			logger.error("Problem with reading paramiter in your computer.", e);
+		} catch(JMSException e) {
+			logger.error("Cannot send message to ActiveMQ");
+			//TODO add reconnection reconnect
+		} catch (JsonGenerationException | JsonMappingException e ) {
+			logger.error("Problem with json ", e);
+		} catch(Exception e) {
+			logger.error("Problem with json ", e);
 		}
 	}
 
-	private SystemInformation createSystemInformation()
+	private JSONSystemInformation createSystemInformation()
 			throws SigarException {
-		SystemInformation information = new SystemInformation();
+		JSONSystemInformation systemInformation = new JSONSystemInformation();
+		JSONMeasurement measurement = new JSONMeasurement();
 		Sigar sigar = new Sigar();
 
-		information.cpu = createCpuInformation(sigar.getCpu());
-		information.mem = createMemoryInformation(sigar.getMem());
-		information.hostname = sigar.getNetInfo().getHostName();
+		measurement.cpu = createCpuInformation(sigar.getCpu());
+		measurement.mem = createMemoryInformation(sigar.getMem());
+		measurement.network = createNetworkInformation(sigar);
+		measurement.disk = createDiskInformation();//TODO
 		
-//		logger.info(String.valueOf(sigar.getNetgetMem().toString()));
-//		logger.info(String.valueOf(sigar.getNetInfo().toString()));
-//		logger.info(String.valueOf(sigar.getNetInfo().toString()));
-//		logger.info(String.valueOf(sigar.getNetInterfaceConfig().toString()));
-//		logger.info(String.valueOf(sigar.getThreadCpu().toString()));
-//		logger.info(String.valueOf(sigar.getPid()));
-//		logger.info(String.valueOf(sigar.getCpuPerc().toString()));
-//		logger.info(String.valueOf(sigar.getFQDN().toString()));
-//		logger.info(String.valueOf(sigar.getTcp().toString()));
-//		logger.info(String.valueOf(sigar.getNetStat().toString()));
-//		logger.info(String.valueOf(sigar.getResourceLimit().toString()));
-//		logger.info(String.valueOf(sigar.getProcStat().toString()));
-//		logger.info(String.valueOf(sigar.toString()));
-//		logger.info(String.valueOf(sigar.getLoadAverage()));
+		systemInformation.measurement = measurement;
+		systemInformation.host = createHostInformation(sigar);
+		systemInformation.name = measurement.network.mac;//TODO change to id or unique value
 		
-		//TODO get list of partition
 //		logger.info(String.valueOf(sigar.getDiskUsage("C:")));
 //		logger.info(String.valueOf(sigar.getDiskUsage("D:")));
 //		logger.info(String.valueOf(sigar.getDiskUsage("E:")));
 		
-		//TODO add netInformation
-//		for(String netInterface: sigar.getNetInterfaceList()) {
-//			logger.info(String.valueOf(sigar.getNetInterfaceStat(netInterface).getRxBytes()));
-//		}
-		
-		return information;
+		return systemInformation;
+	}
+
+	private JSONDisk createDiskInformation() {
+		JSONDisk disk = new JSONDisk();
+		disk.read = 0;
+		disk.write = 0;
+		return disk;
+	}
+
+	private JSONHost createHostInformation(Sigar sigar) throws SigarException {
+		JSONHost host = new JSONHost();
+		host.hostname = sigar.getNetInfo().getHostName();
+		host.ip = sigar.getNetInfo().getPrimaryDns();
+		return host;
 	}
 
 	private JSONMemory createMemoryInformation(Mem mem)
@@ -102,6 +118,44 @@ public class SensorRunnable implements Runnable {
 		return jsonCpu;
 	}
 
-	
+	private JSONNetworkInfo createNetworkInformation(Sigar sigar) {
+		JSONNetworkInfo jsonNetwork = new JSONNetworkInfo();
+
+		
+		try {
+
+			for(String netInterface: sigar.getNetInterfaceList()) {
+	            NetInterfaceStat netStat = sigar.getNetInterfaceStat(netInterface);
+	            NetInterfaceConfig ifConfig = sigar.getNetInterfaceConfig(netInterface);
+	            String hwaddr = ifConfig.getHwaddr();
+	            String ip = sigar.getFQDN();
+				if(ip.equals(ifConfig.getAddress())) {
+	            	
+	            	JSONNetworkStat stat = new JSONNetworkStat();
+
+	    			long start = System.currentTimeMillis();
+	    			long rxBytesStart = netStat.getRxBytes();
+	    			long txBytesStart = netStat.getTxBytes();
+	    			Thread.sleep(100);
+	    			long end = System.currentTimeMillis();
+	    			NetInterfaceStat statEnd = sigar.getNetInterfaceStat(netInterface);
+	    			long rxBytesEnd = statEnd.getRxBytes();
+	    			long txBytesEnd = statEnd.getTxBytes();
+
+	    			stat.download = (rxBytesEnd - rxBytesStart)  / (end - start) * 100;
+	    			stat.upload = (txBytesEnd - txBytesStart)  / (end - start) * 100;	            	
+	            	
+	            	logger.info("Download = " + stat.download + ", Upload = " + stat.upload);
+	            	jsonNetwork.mac = hwaddr;
+	            	jsonNetwork.ip = ip;	
+	            	jsonNetwork.stat = stat;
+	            }	
+			}
+		} catch (Exception e) {
+			logger.error("Cannot create network statistics ", e);
+		}
+		
+		return jsonNetwork;
+	}
 	
 }

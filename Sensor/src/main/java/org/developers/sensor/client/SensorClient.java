@@ -11,15 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SensorClient {
+	private static final Logger logger = LoggerFactory
+			.getLogger(SensorClient.class);
 	
 	private static final long DEFAULT_DELAY = 0L;
 	private static final long DEFAULT_INTERVAL = 5L;
 
 	private static final String INTERVAL = "Schedule";
 	private static final String DELAY = "Delay";
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(SensorClient.class);
 	
 	private Context context = new Context();
 	

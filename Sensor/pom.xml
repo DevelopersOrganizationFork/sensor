@@ -11,12 +11,30 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>native-maven-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<sources>
+						<source>
+							<dircetory>${basedir}/src/main/resource/lib</dircetory>
+							<filenames>
+								<filename>*.dll</filename>
+								<filename>*.so</filename>
+								<filename>*.sl</filename>
+								<filename>*.lib</filename>
+							</filenames>
+						</source>
+					</sources>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
+				<artifactId>maven-antrun-plugin</artifactId>
         		<configuration>
                     <forkMode>once</forkMode>
                     <workingDirectory>target</workingDirectory>
-                    <argLine>-Djava.library.path=${basedir}/src/main/resource/lib</argLine>
+                    <argLine>-Djava.library.path=${basedir}/classes/lib</argLine>
                 </configuration>   
 			</plugin>
 		</plugins>
@@ -42,6 +60,21 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-all</artifactId>
+			<version>5.9.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml</groupId>
+			<artifactId>jackson-xml-databind</artifactId>
+			<version>0.6.2</version>
 		</dependency>
     </dependencies>
 </project>
