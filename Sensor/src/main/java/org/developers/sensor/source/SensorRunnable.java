@@ -34,7 +34,6 @@ public class SensorRunnable implements Runnable {
 	public void run() {
 		try {			
 			JSONSystemInformation information = createSystemInformation();
-
 			jmsConnnection.sendMessage(mapper.writeValueAsString(information));
 			logger.info("information: " + mapper.writeValueAsString(information));
 		} catch (SigarException e) {

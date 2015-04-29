@@ -27,6 +27,7 @@
 						</source>
 					</sources>
 				</configuration>
+                                <version>1.0-alpha-8</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -76,5 +77,15 @@
 			<artifactId>jackson-xml-databind</artifactId>
 			<version>0.6.2</version>
 		</dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
 </project>
