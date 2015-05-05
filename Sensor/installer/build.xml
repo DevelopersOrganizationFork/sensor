@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<project name="sensor-build" default="install">
+
+    <property file="install.properties" />
+    <property name="application_dir" value="${app_dir}" />
+    <property name="application_jar_dir" value="../target" />
+    
+    <target name="server-uninstall" >
+        <delete dir="${application_dir}" />
+    </target>
+    
+    <target name="server-install" depends="server-uninstall">
+        <mkdir dir="${application_dir}" />
+
+		<copydir src="../target/classes/lib" dest="${application_dir}/lib" />
+		<copy file="${application_jar_dir}/sensor-1.0.jar" todir="${application_dir}" />
+       
+    </target>
+    
+    <target name="install" depends="server-install" />
+	<target name="uninstall" depends="server-uninstall" />
+</project>
