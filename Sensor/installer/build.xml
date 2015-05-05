@@ -14,6 +14,7 @@
 
 		<copydir src="../target/classes/lib" dest="${application_dir}/lib" />
 		<copy file="${application_jar_dir}/sensor-1.0.jar" todir="${application_dir}" />
+		<copy file="start.bat" todir="${application_dir}" />
        
     </target>
     
