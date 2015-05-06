@@ -1,4 +1,6 @@
 package org.developers.sensor.source;
+import java.util.Date;
+
 import javax.jms.JMSException;
 
 import org.codehaus.jackson.JsonGenerationException;
@@ -62,6 +64,7 @@ public class SensorRunnable implements Runnable {
 		systemInformation.measurement = measurement;
 		systemInformation.host = createHostInformation(sigar);
 		systemInformation.name = measurement.network.mac;//TODO change to id or unique value
+		systemInformation.date = new Date();
 		
 //		logger.info(String.valueOf(sigar.getDiskUsage("C:")));
 //		logger.info(String.valueOf(sigar.getDiskUsage("D:")));
