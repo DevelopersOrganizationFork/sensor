@@ -122,18 +122,15 @@ public class SensorRunnable implements Runnable {
 
 		
 		try {
-			JSONNetworkStat stat = new JSONNetworkStat();
-			stat.download = 0;
-			stat.upload = 0;
-			String ip = sigar.getFQDN();
-			
+
 			for(String netInterface: sigar.getNetInterfaceList()) {
 	            NetInterfaceStat netStat = sigar.getNetInterfaceStat(netInterface);
 	            NetInterfaceConfig ifConfig = sigar.getNetInterfaceConfig(netInterface);
 	            String hwaddr = ifConfig.getHwaddr();
-	            
+	            String ip = sigar.getFQDN();
+				if(ip.equals(ifConfig.getAddress())) {
 	            	
-	            	
+	            	JSONNetworkStat stat = new JSONNetworkStat();
 
 	    			long start = System.currentTimeMillis();
 	    			long rxBytesStart = netStat.getRxBytes();
@@ -146,15 +143,12 @@ public class SensorRunnable implements Runnable {
 
 	    			stat.download = (rxBytesEnd - rxBytesStart)  / (end - start) * 100;
 	    			stat.upload = (txBytesEnd - txBytesStart)  / (end - start) * 100;	            	
-	            	if(stat.download == 0 || stat.upload == 0) {
-	            		continue;
-	            	} else {
-	            		logger.info("Download = " + stat.download + ", Upload = " + stat.upload);
-	            		jsonNetwork.mac = hwaddr;
-	            		jsonNetwork.ip = ip;	
-	            		jsonNetwork.stat = stat;
-	            		break;
-	            	}
+	            	
+	            	logger.info("Download = " + stat.download + ", Upload = " + stat.upload);
+	            	jsonNetwork.mac = hwaddr;
+	            	jsonNetwork.ip = ip;	
+	            	jsonNetwork.stat = stat;
+	            }	
 			}
 		} catch (Exception e) {
 			logger.error("Cannot create network statistics ", e);
