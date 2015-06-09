@@ -91,7 +91,7 @@ public class SensorRunnable implements Runnable {
 
 	private JSONHost createHostInformation(Sigar sigar, String name) throws SigarException {
 		JSONHost host = new JSONHost();
-		host.hostname = sigar.getNetInfo().getHostName() + name;
+		host.hostname = sigar.getNetInfo().getHostName() + "_" + name;
 		host.ip = sigar.getNetInfo().getPrimaryDns();
 		return host;
 	}
