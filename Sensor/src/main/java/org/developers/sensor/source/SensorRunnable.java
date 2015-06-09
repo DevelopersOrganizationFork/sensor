@@ -41,14 +41,22 @@ public class SensorRunnable implements Runnable {
 			logger.info("information: " + mapper.writeValueAsString(information));
 		} catch (SigarException e) {
 			logger.error("Problem with reading paramiter in your computer.", e);
+			reconnect();
 		} catch(JMSException e) {
 			logger.error("Cannot send message to ActiveMQ");
-			//TODO add reconnection reconnect
+			reconnect();
 		} catch (JsonGenerationException | JsonMappingException e ) {
+			reconnect();
 			logger.error("Problem with json ", e);
 		} catch(Exception e) {
-			logger.error("Problem with json ", e);
+			reconnect();
+			logger.error("Unknown exception ", e);
 		}
+	}
+
+	private void reconnect() {
+		logger.info("Try to reconnect");
+		jmsConnnection = new JMSConnection();
 	}
 
 	private JSONSystemInformation createSystemInformation()
