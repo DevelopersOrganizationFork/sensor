@@ -15,7 +15,7 @@ import org.developers.sensor.client.SensorClient;
  */
 public class Sensor {
     public static void main(String[] args) {
-        System.setProperty("java.library.path", "C:/sensor/lib");
+//        System.setProperty("java.library.path", "C:/sensor/lib");
         new SensorClient().start();
     }
 }
