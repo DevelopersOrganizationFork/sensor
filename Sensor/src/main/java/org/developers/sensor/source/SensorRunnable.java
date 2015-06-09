@@ -29,6 +29,7 @@ public class SensorRunnable implements Runnable {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(SensorRunnable.class);
+	private static final String INACTIVE_IP = "0.0.0.0";
 	
 	private JMSConnection jmsConnnection = new JMSConnection();
 	private ObjectMapper mapper = new ObjectMapper();
@@ -129,6 +130,8 @@ public class SensorRunnable implements Runnable {
 			stat.download = 0;
 			stat.upload = 0;
 			String ip = sigar.getFQDN();
+			jsonNetwork.stat = stat;
+			
 			
 			for(String netInterface: sigar.getNetInterfaceList()) {
 	            NetInterfaceStat netStat = sigar.getNetInterfaceStat(netInterface);
@@ -143,15 +146,14 @@ public class SensorRunnable implements Runnable {
 	    			NetInterfaceStat statEnd = sigar.getNetInterfaceStat(netInterface);
 	    			long rxBytesEnd = statEnd.getRxBytes();
 	    			long txBytesEnd = statEnd.getTxBytes();
-
+            		jsonNetwork.mac = hwaddr;
+            		jsonNetwork.ip = ip;	
 	    			stat.download = (rxBytesEnd - rxBytesStart)  / (end - start) * 100;
 	    			stat.upload = (txBytesEnd - txBytesStart)  / (end - start) * 100;	            	
-	            	if(stat.download == 0 || stat.upload == 0) {
+	            	if(stat.download == 0 && stat.upload == 0) {
 	            		continue;
 	            	} else {
 	            		logger.info("Download = " + stat.download + ", Upload = " + stat.upload);
-	            		jsonNetwork.mac = hwaddr;
-	            		jsonNetwork.ip = ip;	
 	            		jsonNetwork.stat = stat;
 	            		break;
 	            	}
