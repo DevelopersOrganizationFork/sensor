@@ -71,8 +71,8 @@ public class SensorRunnable implements Runnable {
 		measurement.disk = createDiskInformation();//TODO
 		
 		systemInformation.measurement = measurement;
-		systemInformation.host = createHostInformation(sigar);
 		systemInformation.name = measurement.network.mac;//TODO change to id or unique value
+		systemInformation.host = createHostInformation(sigar, systemInformation.name);
 		systemInformation.date = new Date();
 		
 //		logger.info(String.valueOf(sigar.getDiskUsage("C:")));
@@ -89,9 +89,9 @@ public class SensorRunnable implements Runnable {
 		return disk;
 	}
 
-	private JSONHost createHostInformation(Sigar sigar) throws SigarException {
+	private JSONHost createHostInformation(Sigar sigar, String name) throws SigarException {
 		JSONHost host = new JSONHost();
-		host.hostname = sigar.getNetInfo().getHostName();
+		host.hostname = sigar.getNetInfo().getHostName() + name;
 		host.ip = sigar.getNetInfo().getPrimaryDns();
 		return host;
 	}
