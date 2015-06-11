@@ -60,9 +60,12 @@ JSON:
             "total": 1626019373
         },
         "network": {
-            "mac": null,
-            "ip": null,
-            "stat": null
+            "mac":"20:89:84:FE:2D:39",
+            "ip":"192.168.243.108",
+            "stat": {
+                "download":200,
+                "upload":0
+                }
         },
         "disk": {
             "read": 0,
